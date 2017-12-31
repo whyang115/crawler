@@ -6,17 +6,19 @@ const Promise = require("bluebird");
 Promise.promisifyAll(fs);
 
 const baseUrl = "https://www.nvshens.com";
+let x = 0;
 
-//下载所有图片
+//根据分类下载所有图片
 async function downloadImage() {
-  await getImageTags();
+  await getImageTags("gallery");
+  await getImageTags("tag");
 }
 
 // 获取所有的标签
-async function getImageTags() {
+async function getImageTags(cate) {
   const tags = [];
   try {
-    let res = await axios.get(`${baseUrl}/gallery/`);
+    let res = await axios.get(`${baseUrl}/${cate}/`);
     let $ = cheerio.load(res.data);
     $(".tag_div").each((index, item) => {
       $(item)
@@ -93,7 +95,7 @@ async function saveImage(imgUrls) {
       responseType: "stream"
     })
       .then(res => {
-        res.data.pipe(fs.createWriteStream("./img/" + key + ".jpg"));
+        res.data.pipe(fs.createWriteStream("./img/" + x++ + ".jpg"));
       })
       .catch(err => console.log(err));
   }
